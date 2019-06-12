@@ -1,4 +1,5 @@
 .idea/
+node_modules/
 
 app/assets/styles/css/
 

@@ -1,15 +1,17 @@
 {
   "name": "battleships",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "gulpfile.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "gulp watch",
+    "start--pull": "git pull origin master && gulp watch"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "browsersync": "0.0.1-security",
+    "browser-sync": "^2.26.7",
     "common-js": "^0.3.8",
     "gulp": "^3.9.1",
     "gulp-sass": "^4.0.2",
