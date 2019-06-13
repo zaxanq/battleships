@@ -9,13 +9,29 @@
   border-top-width: 1px
   border-right-width: 1px
 
+  &.blocked
+    pointer-events: none
+
 .row
   +flex(center, center)
 
 .field
   +flex(center, center)
-  +size(2.6vw, 2.6vw)
+  +size($field-size, $field-size)
+  position: relative
   background-color: $field-empty-color
   border-left-width: 1px
   border-bottom-width: 1px
 
+  &:hover
+    background-color: $field-empty-hover-color
+
+
+.row:first-child
+  > .field::before
+    content: 'X'
+    position: absolute
+    top: -$field-size
+    +flex(center, center)
+    width: inherit
+    height: inherit

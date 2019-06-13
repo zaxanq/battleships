@@ -1,8 +1,9 @@
-=flex($jc, $ai, $fd: 'row')
+=flex($jc, $ai, $fd: row)
   display: flex
-  flex-direction: $fd
   justify-content: $jc
   align-items: $ai
+  @if $fd != row
+    flex-direction: $fd
 
 =size($w, $h)
   width: $w
