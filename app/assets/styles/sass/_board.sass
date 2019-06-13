@@ -9,6 +9,9 @@
   border-top-width: 1px
   border-right-width: 1px
 
+  &:first-child
+    margin-right: 10rem
+
   &.blocked
     pointer-events: none
 
@@ -27,11 +30,60 @@
     background-color: $field-empty-hover-color
 
 
-.row:first-child
-  > .field::before
-    content: 'X'
+.row > .field:first-child,
+.row:first-child > .field
+  &::before,
+  &::after
     position: absolute
-    top: -$field-size
     +flex(center, center)
     width: inherit
     height: inherit
+
+.row:first-child > .field
+  &::before
+    top: -$field-size
+  &:nth-child(1)::before
+    content: 'A'
+  &:nth-child(2)::before
+    content: 'B'
+  &:nth-child(3)::before
+    content: 'C'
+  &:nth-child(4)::before
+    content: 'D'
+  &:nth-child(5)::before
+    content: 'E'
+  &:nth-child(6)::before
+    content: 'F'
+  &:nth-child(7)::before
+    content: 'G'
+  &:nth-child(8)::before
+    content: 'H'
+  &:nth-child(9)::before
+    content: 'I'
+  &:nth-child(10)::before
+    content: 'J'
+
+.row > .field:first-child
+  &::after
+    left: -$field-size
+
+.row:nth-child(1) > .field:first-child::after
+    content: '1'
+.row:nth-child(2) > .field:first-child::after
+    content: '2'
+.row:nth-child(3) > .field:first-child::after
+    content: '3'
+.row:nth-child(4) > .field:first-child::after
+    content: '4'
+.row:nth-child(5) > .field:first-child::after
+    content: '5'
+.row:nth-child(6) > .field:first-child::after
+    content: '6'
+.row:nth-child(7) > .field:first-child::after
+    content: '7'
+.row:nth-child(8) > .field:first-child::after
+    content: '8'
+.row:nth-child(9) > .field:first-child::after
+    content: '9'
+.row:nth-child(10) > .field:first-child::after
+    content: '10'

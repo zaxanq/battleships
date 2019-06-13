@@ -32,12 +32,12 @@ class Board extends Base {
     }
 
     createFields(board) {
-        let letters = 'ABCDEFGH';
+        let letters = 'ABCDEFGHIJ';
         board.field = {};
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 10; i++) {
             let row = document.createElement('div').addClass(['row', `row-${letters[i]}`]);
             board.DOM.board.append(row);
-            for (let j = 1; j <= 8; j++) {
+            for (let j = 1; j <= 10; j++) {
                 board.field[`${letters[i]}${j}`] = this.fieldState[0];
                 let field = document.createElement('div').addClass(['field', board.name, `${letters[i]}${j}`]);
                 row.append(field);
