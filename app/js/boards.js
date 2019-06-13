@@ -27,9 +27,13 @@ class Boards extends Base {
         let board = document.createElement('div');
         board.addClass(['board', 'board-' + name]);
         this.main.append(board);
-        this.Boards[name] = {name: name, DOM: {board: this.class('board-' + name)[0], active: false}};
+        this.Boards[name] = {name: name, DOM: {board: this.class('board-' + name)[0]}, active: false};
 
         this.createFields(this.Boards[name]);
+
+        if (name === 'player') {
+            this.shipHolder = this.createShipHolder();
+        }
     }
 
     createFields(board) {
@@ -40,10 +44,27 @@ class Boards extends Base {
             board.DOM.board.append(row);
             for (let j = 1; j <= 10; j++) {
                 board.field[`${letters[i]}${j}`] = this.fieldState[0];
-                let field = document.createElement('div').addClass(['field', board.name, `${letters[i]}${j}`]);
+                let field = document.createElement('div').addClass(['field', this.fieldClasses['empty'], board.name, `${letters[i]}${j}`]);
                 row.append(field);
             }
         }
+    }
+
+    createShipHolder() {
+        let shipHolderWrapper = document.createElement('div').addClass('ship-holder');
+        this.Boards.player.DOM.board.prepend(shipHolderWrapper);
+
+        let shipHolderText = document.createElement('span')
+            .addClass('ship-holder__text')
+            .innerText = 'Place ship:';
+        shipHolderWrapper.append(shipHolderText);
+
+        let shipHolder = document.createElement('div')
+            .addClass('ship-holder__ship');
+        shipHolderWrapper.append(shipHolder);
+
+        this.Boards.player.DOM.shipHolder = shipHolder;
+        return shipHolder;
     }
 
 }
