@@ -1,13 +1,18 @@
-const Board = require('./board');
+const Base = require('./base');
+const Boards = require('./boards');
+const Mechanism = require('./mechanism');
 
-class Game extends Board {
+class Game extends Base {
     constructor() {
         super();
     }
 
     init() {
-        this.createBoards();
+        Boards.create();
+        Mechanism.start();
     }
+
+
 }
 
 (new Game).init();

@@ -1,6 +1,6 @@
 const Base = require('./base');
 
-class Board extends Base {
+class Boards extends Base {
     constructor() {
         super();
         this.main = this.class('main-container')[0];
@@ -9,17 +9,17 @@ class Board extends Base {
         this.fieldClasses = this.createFieldClasses();
     }
 
+    create() {
+        this.initBoard('player');
+        this.initBoard('ai');
+    }
+
     createFieldClasses() {
         let object = {};
         this.fieldState.forEach(state => {
             object[state] = `field--${state}`;
         });
         return object;
-    }
-
-    createBoards() {
-        this.initBoard('player');
-        this.initBoard('ai');
     }
 
     initBoard(name) {
@@ -47,4 +47,4 @@ class Board extends Base {
 
 }
 
-module.exports = Board;
+module.exports = new Boards;
