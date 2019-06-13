@@ -12,6 +12,7 @@ class Boards extends Base {
     create() {
         this.initBoard('player');
         this.initBoard('ai');
+        console.info('INFO: Boards rendered.');
     }
 
     createFieldClasses() {

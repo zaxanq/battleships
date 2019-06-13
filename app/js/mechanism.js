@@ -7,20 +7,30 @@ class Mechanism extends Base {
 
     init() {
         this.initAlerts();
+        this.gameStart();
     }
 
-    info(msg) {
-        this.infoContainer.innerText = msg;
+    alert(msg) {
+        this.alertMessage.innerText = msg;
+        this.alertOverlay.addClass('visible');
     }
 
     initAlerts() {
-        this.infoContainer = this.class('info-container')[0];
-        console.info('Alerts loaded.');
-        this.info('Test alert.');
+        this.alertMessage = this.id('alert-message');
+        this.alertOverlay = this.class('alert-overlay')[0];
+        this.id('alert-ok').addEventListener('click', (event) => {
+            event.stopPropagation();
+            this.alertOverlay.removeClass('visible');
+        });
+        console.info('INFO: Alerts loaded.');
     }
 
     start() {
         this.init();
+    }
+
+    gameStart() {
+        this.alert('Game starts.\nYour board is on the left.\nPlease place your ships.')
     }
 }
 

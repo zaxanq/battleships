@@ -1,0 +1,31 @@
+.alert-overlay
+  position: absolute
+  top: 0
+  left: 0
+  +flex(center, center)
+  +size(100%, 100%)
+  opacity: 0
+  pointer-events: none
+  transition: opacity .25s ease-in-out
+
+  &.visible
+    opacity: 1
+    pointer-events: all
+
+.alert-container
+  position: relative
+  +flex(center, center, column)
+  +size(50rem, 20rem)
+  background-color: $alert-color
+  border: $common-border
+
+#alert-message
+  text-align: center
+
+#alert-ok
+  position: absolute
+  bottom: 2rem
+  border: $common-border
+  background-color: $field-empty-color
+  padding: 0.5rem 4rem
+  font: inherit

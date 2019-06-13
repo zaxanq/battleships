@@ -8,6 +8,7 @@ class Game extends Base {
     }
 
     init() {
+        console.info('INFO: Init.');
         Boards.create();
         Mechanism.start();
     }
