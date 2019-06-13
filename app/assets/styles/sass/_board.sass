@@ -1,0 +1,21 @@
+@import 'variables'
+
+.board,
+.field
+  border: 0 solid $field-border-color
+
+.board
+  +flex(center, center, column)
+  border-top-width: 1px
+  border-right-width: 1px
+
+.row
+  +flex(center, center)
+
+.field
+  +flex(center, center)
+  +size(2.6vw, 2.6vw)
+  background-color: $field-empty-color
+  border-left-width: 1px
+  border-bottom-width: 1px
+
