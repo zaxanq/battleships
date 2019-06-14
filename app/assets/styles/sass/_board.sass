@@ -31,3 +31,18 @@
 
   .field:not(:last-child)
     border-right-width: 0
+
+
+.label-container--horizontal,
+.label-container--vertical
+  position: absolute
+
+.label-container--horizontal
+  +flex(flex-start, flex-start)
+  +size(100%, $field-size)
+  top: -$field-size
+
+.label-container--vertical
+  +flex(flex-start, flex-start, column)
+  +size($field-size, 100%)
+  left: -$field-size

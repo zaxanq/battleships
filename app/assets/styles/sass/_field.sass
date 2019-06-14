@@ -1,93 +1,69 @@
 @import 'variables'
 
+.label,
 .field
   +flex(center, center)
   +size($field-size, $field-size)
   position: relative
-  background-color: $field-empty-color
   border: $common-border
+
+  &::before
+    content: ''
+
+.label
+  border-color: transparent
+
+.field--empty
+  background-color: $field-empty-color
 
   &:hover
     background-color: $field-empty-hover-color
 
+.field--miss
+  background-color: $field-miss-color
+
+  &:hover
+    background-color: $field-miss-hover-color
   &::before
-    content: ''
     +size(1rem, 1rem)
+    border-radius: 50%
+    border: 1px solid $field-marker-color
 
-.field--miss::before
-  border-radius: 50%
-  border: $common-border
+.field--ship
+  background-color: $field-ship-color
 
-.field--ship::before
-  border-radius: 50%
-  background-color: $field-border-color
+  &:hover
+    background-color: $field-ship-hover-color
 
-.field--hit::before
-  //border-radius: 50% TODO: Add "X" to represent hitted ship
-  //background-color: $field-border-color
+  &::before
+    +size(1.2rem, 1.2rem)
+    border-radius: 50%
+    background-color: $field-marker-color
+
+.field--hit
+  background-color: $field-hit-color
+
+  &:hover
+    background-color: $field-hit-hover-color
+
+  &::before
+    position: absolute
+    transform: rotate(45deg)
+    content: '+'
+    color: $field-marker-color
+    font-size: 3.6rem
 
 .field--sunk
   background-color: $field-sunk-color
 
+  &:hover
+    background-color: $field-sunk-hover-color
+
+  &::before
+    position: absolute
+    content: '\2020'
+    font-size: 2.8rem
 
 .row > .field
   border-top-width: 0
   border-right-width: 0
-
-.row > .field:first-child,
-.row:first-child > .field
-  &::before,
-  &::after
-    position: absolute
-    +flex(center, center)
-    width: inherit
-    height: inherit
-
-.row:first-child > .field
-  &::before
-    top: -$field-size
-  &:nth-child(1)::before
-    content: 'A'
-  &:nth-child(2)::before
-    content: 'B'
-  &:nth-child(3)::before
-    content: 'C'
-  &:nth-child(4)::before
-    content: 'D'
-  &:nth-child(5)::before
-    content: 'E'
-  &:nth-child(6)::before
-    content: 'F'
-  &:nth-child(7)::before
-    content: 'G'
-  &:nth-child(8)::before
-    content: 'H'
-  &:nth-child(9)::before
-    content: 'I'
-  &:nth-child(10)::before
-    content: 'J'
-
-.row > .field:first-child
-  &::after
-    left: -$field-size
-
-.row:nth-child(1) > .field:first-child::after
-  content: '1'
-.row:nth-child(2) > .field:first-child::after
-  content: '2'
-.row:nth-child(3) > .field:first-child::after
-  content: '3'
-.row:nth-child(4) > .field:first-child::after
-  content: '4'
-.row:nth-child(5) > .field:first-child::after
-  content: '5'
-.row:nth-child(6) > .field:first-child::after
-  content: '6'
-.row:nth-child(7) > .field:first-child::after
-  content: '7'
-.row:nth-child(8) > .field:first-child::after
-  content: '8'
-.row:nth-child(9) > .field:first-child::after
-  content: '9'
-.row:nth-child(10) > .field:first-child::after
-  content: '10'
