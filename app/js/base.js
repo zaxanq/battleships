@@ -43,6 +43,10 @@ class Base {
     id(idName) {
         return document.getElementById(idName);
     }
+
+    DOM(selector) {
+        return document.querySelectorAll(selector);
+    }
 }
 
 module.exports = Base;

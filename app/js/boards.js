@@ -5,7 +5,7 @@ class Boards extends Base {
         super();
         this.main = this.class('main-container')[0];
         this.Boards = {};
-        this.fieldState = ['empty', 'miss', 'ship', 'hit', 'sunk'];
+        this.fieldState = ['illicit', 'empty', 'miss', 'ship', 'hit', 'sunk'];
         this.fieldClasses = this.createFieldClasses();
     }
 
@@ -41,12 +41,13 @@ class Boards extends Base {
     createFields(board) {
         this.letters = 'ABCDEFGHIJ';
         board.field = {};
-        for (let i = 0; i < 10; i++) {
-            let row = document.createElement('div').addClass(['row', `row-${this.letters[i]}`]);
+        for (let i = 1; i <= 10; i++) {
+            let row = document.createElement('div').addClass(['row', `row-${i}`]);
             board.DOM.board.append(row);
-            for (let j = 1; j <= 10; j++) {
-                board.field[`${this.letters[i]}${j}`] = this.fieldState[0];
-                let field = document.createElement('div').addClass(['field', this.fieldClasses['empty'], board.name, `${this.letters[i]}${j}`]);
+            for (let j = 0; j < 10; j++) {
+                board.field[`${this.letters[j]}${i}`] = this.fieldState[0];
+                let field = document.createElement('div')
+                    .addClass(['field', `${this.letters[j]}${i}`, this.fieldClasses['empty'], board.name]);
                 row.append(field);
             }
         }
