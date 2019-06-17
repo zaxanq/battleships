@@ -22,12 +22,13 @@
 .ship-holder
   position: absolute
   top: -10rem
-  +flex(space-between, center)
-  +size(33rem, 5rem)
+  +flex(flex-start, center)
+  +size(34rem, 5rem)
   pointer-events: none
 
 .ship-holder__ship
   +flex(flex-start, center)
+  margin-left: 2rem
 
   .field:not(:last-child)
     border-right-width: 0

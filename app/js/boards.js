@@ -4,8 +4,9 @@ class Boards extends Base {
     constructor() {
         super();
         this.main = this.class('main-container')[0];
-        this.Boards = {};
-        this.fieldState = ['illicit', 'empty', 'miss', 'ship', 'hit', 'sunk'];
+        this.player = {};
+        this.ai = {};
+        this.fieldState = {illicit: 'illicit', empty: 'empty', miss: 'miss', ship: 'ship', hit: 'hit', sunk: 'sunk'};
         this.fieldClasses = this.createFieldClasses();
     }
 
@@ -17,9 +18,11 @@ class Boards extends Base {
 
     createFieldClasses() {
         let object = {};
-        this.fieldState.forEach(state => {
-            object[state] = `field--${state}`;
-        });
+
+        for (let key in this.fieldState) {
+            object[key] = `field--${key}`;
+        }
+
         return object;
     }
 
@@ -28,10 +31,10 @@ class Boards extends Base {
         board.addClass(['board', 'board-' + name]);
         this.main.append(board);
 
-        this.Boards[name] = {name: name, DOM: {board: this.class('board-' + name)[0]}, active: false};
+        this[name] = {name: name, DOM: {board: this.class('board-' + name)[0]}, active: false};
 
-        this.createFields(this.Boards[name]);
-        this.createLabels(this.Boards[name]);
+        this.createFields(this[name]);
+        this.createLabels(this[name]);
 
         if (name === 'player') {
             this.shipHolder = this.createShipHolder();
@@ -45,9 +48,9 @@ class Boards extends Base {
             let row = document.createElement('div').addClass(['row', `row-${i}`]);
             board.DOM.board.append(row);
             for (let j = 0; j < 10; j++) {
-                board.field[`${this.letters[j]}${i}`] = this.fieldState[0];
+                board.field[`${this.letters[j]}${i}`] = this.fieldState.empty;
                 let field = document.createElement('div')
-                    .addClass(['field', `${this.letters[j]}${i}`, this.fieldClasses['empty'], board.name]);
+                    .addClass(['field', `${this.letters[j]}${i}`, this.fieldClasses.empty, board.name]);
                 row.append(field);
             }
         }
@@ -73,7 +76,7 @@ class Boards extends Base {
 
     createShipHolder() {
         let shipHolderWrapper = document.createElement('div').addClass('ship-holder');
-        this.Boards.player.DOM.board.prepend(shipHolderWrapper);
+        this.player.DOM.board.prepend(shipHolderWrapper);
 
         let shipHolderText = document.createElement('span')
             .addClass('ship-holder__text')
@@ -84,7 +87,7 @@ class Boards extends Base {
             .addClass('ship-holder__ship');
         shipHolderWrapper.append(shipHolder);
 
-        this.Boards.player.DOM.shipHolder = shipHolder;
+        this.player.DOM.shipHolder = shipHolder;
         return shipHolder;
     }
 

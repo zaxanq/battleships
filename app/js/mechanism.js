@@ -7,14 +7,15 @@ class Mechanism extends Base {
         this.gameStatus = 0; //0 - not started, 1 - ship placement, 2 - game starts, 3 - game finished
     }
 
+    start() {
+        this.init();
+        this.addListeners();
+        this.gameStart();
+    }
+
     init() {
         this.initAlerts();
         this.initShips();
-    }
-
-    alert(msg) {
-        this.alertMessage.innerText = msg;
-        this.alertOverlay.addClass('visible');
     }
 
     initAlerts() {
@@ -27,39 +28,56 @@ class Mechanism extends Base {
         console.info('INFO: Alerts loaded.');
     }
 
-    start() {
-        this.init();
-        this.addListeners();
-        this.gameStart();
+    alert(msg) {
+        this.alertMessage.innerText = msg;
+        this.alertOverlay.addClass('visible');
+    }
+
+    initShips() {
+        this.gameStatus = 1; // ship placement started
+        this.playerShips = this.assertShips();
+        this.aiShips = this.assertShips();
+
+        this.currentShip = 5;
+        this.createCurrentShipToPlace();
     }
 
     addListeners() {
         [...this.DOM('.board-player .field')].map(field => {
-            field.addEventListener('click', event => {
-                let xy = field.classList[1];
-
-                if (this.gameStatus === 1) { // if ship placement stage
-                    for (let size = 5; size > 0; size--) {
-                        for (let ship = 0; ship < 5 - (size - ship - 1); ship++) {
-                            for (let position = 0; position < size - ship; position++) {
-                                if (this.playerShips[size][ship][position] === null) {
-                                    if (this.validateField(xy, this.playerShips[size][ship])) {
-                                        this.playerShips[size][ship][position] = xy;
-
-                                        field.removeClass(Boards.fieldClasses['empty']).addClass(Boards.fieldClasses['ship']);
-                                        Boards.Boards.player.field[xy] = 'ship';
-                                        return;
-                                    } else {
-                                        this.alert('Invalid field.');
-                                    }
-                                }
-                            }
-                        }
-                    }
+            field.addEventListener('click', () => {
+                if (this.gameStatus === 1) {
+                    this.placeShip(field.classList[1]);
                 }
             });
         });
         console.info('INFO: Listeners added.');
+    }
+
+    placeShip(xy) {
+
+        Boards.player.field[xy] = Boards.fieldState.ship;
+        this.class(xy)[0].addClass(Boards.fieldClasses.ship);
+
+        for (let size = 0; size < 5 - this.currentShip + 1; size++) {
+            for (let position = 0; position < 5 - size + 1; position++) {
+                console.log(this.currentShip, size, position);
+                if (this.playerShips[this.currentShip][size][position] === null) {
+                    this.playerShips[this.currentShip][size][position] = xy;
+
+                    if (size === 5 - this.currentShip && position === this.currentShip - 1) {
+                        this.currentShip--;
+                        if (this.currentShip === 0) {
+                            this.assertAiShips();
+                        } else {
+                            this.updateCurrentShipToPlace();
+                        }
+                    }
+
+                    return;
+                }
+            }
+            console.log(this.playerShips[this.currentShip]);
+        }
     }
 
     validateField(xy, ship) {
@@ -89,8 +107,16 @@ class Mechanism extends Base {
         }
         console.log(lastXY, xy);
         if (lastXY[0] === xy[0]) {
+            if (this.shipDirection === 'horizontal') {
+                this.alert('Cannot change ship direction');
+                return {result: false, reason: 'invalid-ship-placement'}
+            }
             this.shipDirection = 'vertical';
         } else {
+            if (this.shipDirection === 'vertical') {
+                this.alert('Cannot change ship direction');
+                return {result: false, reason: 'invalid-ship-placement'}
+            }
             this.shipDirection = 'horizontal';
         }
 
@@ -98,14 +124,14 @@ class Mechanism extends Base {
         let array = [];
 
         ship.map(point => {
-           // map findNeighboursAround for each point other than null
+            // map findNeighboursAround for each point other than null
         });
         return this.findNeighboursAround(xy);
     }
 
     findNeighboursAround(xy) {
         let array = [];
-        let x = xy.slice(0,1);
+        let x = xy.slice(0, 1);
         let y = xy.slice(1);
 
         if (y !== '1') {
@@ -123,20 +149,16 @@ class Mechanism extends Base {
         return array;
     }
 
-    initShips() {
-        this.gameStatus = 1; // ship placement started
-        this.playerShips = this.assertShips();
-        this.aiShips = this.assertShips();
-
-        this.currentShip = 5;
-        this.showCurrentShipToPlace();
-    }
-
-    showCurrentShipToPlace() {
-        for (let i = 0; i < 5; i++) {
+    createCurrentShipToPlace() {
+        for (let i = 0; i < this.currentShip; i++) {
             let field = document.createElement('div').addClass(['field', Boards.fieldClasses['ship']]);
             Boards.shipHolder.append(field);
         }
+    }
+
+    updateCurrentShipToPlace() {
+        [...Boards.shipHolder.children].map(child => child.remove());
+        this.createCurrentShipToPlace();
     }
 
     assertShips() {
@@ -152,6 +174,12 @@ class Mechanism extends Base {
             }
         }
         return ships;
+    }
+
+    assertAiShips() {
+        this.class('ship-holder')[0].remove();
+        this.class('board-player')[0].addClass('blocked');
+        this.alert('Placing Ai ships.');
     }
 
 
