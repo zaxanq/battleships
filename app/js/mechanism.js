@@ -54,45 +54,63 @@ class Mechanism extends Base {
     }
 
     placeShip(xy) {
-
-        Boards.player.field[xy] = Boards.fieldState.ship;
-        this.class(xy)[0].addClass(Boards.fieldClasses.ship);
-
         for (let size = 0; size < 5 - this.currentShip + 1; size++) {
             for (let position = 0; position < 5 - size + 1; position++) {
-                console.log(this.currentShip, size, position);
                 if (this.playerShips[this.currentShip][size][position] === null) {
-                    this.playerShips[this.currentShip][size][position] = xy;
+                    let validation = this.validateField(xy, this.playerShips[this.currentShip][size]);
+                    if (validation.result) {
+                        Boards.player.field[xy] = Boards.fieldState.ship;
+                        this.class(xy)[0].addClass(Boards.fieldClasses.ship);
 
-                    if (size === 5 - this.currentShip && position === this.currentShip - 1) {
-                        this.currentShip--;
-                        if (this.currentShip === 0) {
-                            this.assertAiShips();
-                        } else {
-                            this.updateCurrentShipToPlace();
+                        this.playerShips[this.currentShip][size][position] = xy;
+
+                        if (size === 5 - this.currentShip && position === this.currentShip - 1) {
+                            this.currentShip--;
+                            if (this.currentShip === 0) {
+                                this.assertAiShips();
+                            } else {
+                                this.updateCurrentShipToPlace();
+                            }
                         }
+                        return;
+                    } else {
+                        this.alert(validation.reason);
+                        return;
                     }
-
-                    return;
                 }
             }
-            console.log(this.playerShips[this.currentShip]);
         }
     }
 
     validateField(xy, ship) {
-        if (ship[0] !== null) {
-            if (!this.Neighbours.includes(xy)) {
-                return false;
+        let thisField = Boards.player.field[xy];
+        if (thisField === Boards.fieldState.ship) {
+            return {result: false, reason: 'This field already contains a ship.'};
+        }
+        if (this.illicitFields(ship)) {
+            return {result: false, reason: 'Cannot place ship on this field.'}
+        }
+        return {result: true};
+    }
+
+    illicitFields(ship) {
+        let noCoords = true;
+        for (let i = ship.length - 1; i >= 0; i--) {
+            if (ship[i] !== null) {
+                noCoords = false;
+                break;
             }
-            this.Neighbours = this.findNeighboursInLine(xy, ship);
-        } else {
-            this.Neighbours = this.findNeighboursAround(xy);
         }
 
-        //validate with illicit fields
+        if (noCoords) {
+            return;
+        } else {
+            // determine ship Direction
+        }
 
-        return true;
+
+
+        return false;
     }
 
     findNeighboursInLine(xy, ship) {
