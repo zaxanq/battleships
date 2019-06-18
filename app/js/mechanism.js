@@ -101,46 +101,54 @@ class Mechanism extends Base {
     }
 
     renderIllicitFieldsAroundShips() {
-        let ships = this.DOM(`.board-player > .row > .${Boards.fieldClasses.ship}`);
-        console.log(ships);
+        this.clearBoard(Boards.fieldState.empty);
+
+        let ships = [...this.DOM(`.board-player > .row > .${Boards.fieldClasses.ship}`)];
+        let shipsCoords = ships.map(ship => ship.classList[1]);
+        let areaAroundShips = [];
+
+        for (let i = 0; i < shipsCoords.length; i++) {
+            this.joinArrays(areaAroundShips, this.findNeighboursAround(shipsCoords[i]));
+        }
+        this.findNeighboursInCorners(shipsCoords, areaAroundShips);
+
+        for (let i = 0; i < areaAroundShips.length; i++) {
+            this.updateField(this.class(areaAroundShips[i])[0], 'ship', 'empty', 'illicit');
+        }
+    }
+
+    clearBoard(fieldState) {
+        let toRemove;
+        if (fieldState === 'empty') toRemove = 'illicit';
+        else toRemove = 'empty';
+
+        let fields = this.DOM(`.board-player > .row > .${Boards.fieldClasses[toRemove]}`);
+        for (let i = 0; i < fields.length; i++) {
+            this.updateField(fields[i], 'ship', toRemove, fieldState);
+        }
     }
 
     renderIllicitFields(ship) {
-        let fields = this.DOM(`.board-player > .row > .${Boards.fieldClasses.empty}`);
-        for (let i = 0; i < fields.length; i++) {
-            this.updateFields(fields[i], 'ship', 'empty', 'illicit');
-            if (!fields[i].hasClass(Boards.fieldClasses.ship))
-                fields[i].removeClass(Boards.fieldClasses.empty).addClass(Boards.fieldClasses.illicit);
-        }
+        this.clearBoard(Boards.fieldState.illicit);
 
-        let noCoords = true;
         let i;
         for (i = ship.length - 1; i >= 0; i--) {
             if (ship[i] !== null) {
-                noCoords = false;
                 break;
             }
         }
 
-        if (noCoords) {
-            // new ship to be placed
-            console.log('new ship to be placed');
-            return;
+        if (i + 1 === 1) {
+            this.renderValidFields(this.findNeighboursAround(ship[i]));
         } else {
-            if (i + 1 === 1) {
-                this.renderValidFields(this.findNeighboursAround(ship[i]));
-            } else {
-                this.renderValidFields(this.findNeighboursInLine(ship));
-            }
+            this.renderValidFields(this.findNeighboursInLine(ship));
         }
-
-
         return false;
     }
 
-    updateFields(fields, classToHave, classToRemove, classToAdd) {
-        if (!fields.hasClass(Boards.fieldClasses[classToHave])) {
-            fields.removeClass(Boards.fieldClasses[classToRemove]).addClass(Boards.fieldClasses[classToAdd]);
+    updateField(field, fieldClassToNotHave, fieldClassToRemove, fieldClassToAdd) {
+        if (!field.hasClass(Boards.fieldClasses[fieldClassToNotHave])) {
+            field.removeClass(Boards.fieldClasses[fieldClassToRemove]).addClass(Boards.fieldClasses[fieldClassToAdd]);
         }
     }
 
@@ -149,10 +157,10 @@ class Mechanism extends Base {
             if (field) {
                 if (typeof field !== 'string') { // if array actually consists of arrays of coords
                     field.map(element => {
-                        this.updateFields(this.class(element)[0], 'ship', 'illicit', 'empty');
+                        this.updateField(this.class(element)[0], 'ship', 'illicit', 'empty');
                     });
                 } else { // if it's just one coord
-                    this.updateFields(this.class(field)[0], 'ship', 'illicit', 'empty');
+                    this.updateField(this.class(field)[0], 'ship', 'illicit', 'empty');
                 }
             }
         });
@@ -167,6 +175,39 @@ class Mechanism extends Base {
             }
         });
         return array;
+    }
+
+    findNeighboursInCorners(ship, array) {
+            array.push(this.move(ship[0], 'UL'));
+            array.push(this.move(ship[ship.length - 1], 'DR'));
+            array.push(this.move(ship[ship.length - 1], 'UR'));
+
+        if (this.shipDirection === 'horizontal') {
+            array.push(this.move(ship[0], 'DL'));
+        } else {
+            array.push(this.move(ship[0], 'UR'));
+        }
+        return array;
+    }
+
+    move(coords, direction) {
+        if (direction === 'U') {
+            return coords[0] + (parseInt(coords[1]) - 1);
+        } else if (direction === 'D') {
+            return coords[0] + (parseInt(coords[1]) + 1);
+        } else if (direction === 'L') {
+            return Boards.letters[Boards.letters.indexOf(coords[0]) - 1] + coords[1];
+        } else if (direction === 'R') {
+            return Boards.letters[Boards.letters.indexOf(coords[0]) + 1] + coords[1];
+        } else if (direction === 'UL') {
+            return this.move(this.move(coords, 'U'), 'L');
+        } else if (direction === 'UR') {
+            return this.move(this.move(coords, 'U'), 'R');
+        } else if (direction === 'DL') {
+            return this.move(this.move(coords, 'D'), 'L');
+        } else if (direction === 'DR') {
+            return this.move(this.move(coords, 'D'), 'R');
+        }
     }
 
     determineDirection(ship) {

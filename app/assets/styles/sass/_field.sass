@@ -7,9 +7,6 @@
   position: relative
   border: $common-border
 
-  &::before
-    content: ''
-
 .label
   border-color: transparent
 
@@ -39,7 +36,9 @@
 
   &:hover
     background-color: $field-miss-hover-color
+
   &::before
+    content: ''
     +size(1rem, 1rem)
     border-radius: 50%
     border: 1px solid $field-marker-color
@@ -51,6 +50,7 @@
     background-color: $field-ship-hover-color
 
   &::before
+    content: ''
     +size(1.2rem, 1.2rem)
     border-radius: 50%
     background-color: $field-marker-color
