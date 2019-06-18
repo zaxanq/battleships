@@ -39,11 +39,12 @@ class Mechanism extends Base {
         this.aiShips = this.assertShips();
 
         this.currentShip = 5;
+        this.placedShips = [];
         this.createCurrentShipToPlace();
     }
 
     addListeners() {
-        [...this.DOM('.board-player .field')].map(field => {
+        [...this.DOM('.board-player > .row > .field')].map(field => {
             field.addEventListener('click', () => {
                 if (this.gameStatus === 1) {
                     this.placeShip(field.classList[1]);
@@ -57,45 +58,64 @@ class Mechanism extends Base {
         for (let size = 0; size < 5 - this.currentShip + 1; size++) {
             for (let position = 0; position < 5 - size + 1; position++) {
                 if (this.playerShips[this.currentShip][size][position] === null) {
-                    let validation = this.validateField(xy, this.playerShips[this.currentShip][size]);
+                    let validation = this.validateField(xy);
                     if (validation.result) {
-                        Boards.player.field[xy] = Boards.fieldState.ship;
-                        this.class(xy)[0].addClass(Boards.fieldClasses.ship);
-
+                        this.changeField('player', xy, Boards.fieldClasses.ship);
                         this.playerShips[this.currentShip][size][position] = xy;
+                        Boards.player.field[xy] = Boards.fieldState.ship;
 
-                        if (size === 5 - this.currentShip && position === this.currentShip - 1) {
-                            this.currentShip--;
-                            if (this.currentShip === 0) {
-                                this.assertAiShips();
-                            } else {
-                                this.updateCurrentShipToPlace();
-                            }
-                        }
-                        return;
+                        this.renderIllicitFields(this.playerShips[this.currentShip][size]);
                     } else {
+                        position--;
                         this.alert(validation.reason);
-                        return;
                     }
+
+                    if (size === 5 - this.currentShip && position === this.currentShip - 1) {
+                        this.placedShips.push(this.currentShip);
+                        this.currentShip--;
+                        if (this.currentShip === 0) {
+                            this.assertAiShips();
+                        } else {
+                            this.updateCurrentShipToPlace();
+                            this.renderIllicitFieldsAroundShips();
+                        }
+                    }
+                    return;
                 }
             }
         }
     }
 
-    validateField(xy, ship) {
-        let thisField = Boards.player.field[xy];
-        if (thisField === Boards.fieldState.ship) {
-            return {result: false, reason: 'This field already contains a ship.'};
+    validateField(coords) {
+        if (this.class(coords)[0].classList.contains(Boards.fieldClasses.ship)) {
+            return {result: false, reason: 'ship-already-placed'};
         }
-        if (this.illicitFields(ship)) {
-            return {result: false, reason: 'Cannot place ship on this field.'}
+        if (this.class(coords)[0].classList.contains(Boards.fieldClasses.illicit)) {
+            return {result: false, reason: 'illicit-field'};
         }
         return {result: true};
     }
 
-    illicitFields(ship) {
+    changeField(board, coords, state) {
+        this.DOM(`.board-${board} .${coords}`)[0].removeClass(Boards.fieldClassesArray).addClass(state);
+    }
+
+    renderIllicitFieldsAroundShips() {
+        let ships = this.DOM(`.board-player > .row > .${Boards.fieldClasses.ship}`);
+        console.log(ships);
+    }
+
+    renderIllicitFields(ship) {
+        let fields = this.DOM(`.board-player > .row > .${Boards.fieldClasses.empty}`);
+        for (let i = 0; i < fields.length; i++) {
+            this.updateFields(fields[i], 'ship', 'empty', 'illicit');
+            if (!fields[i].hasClass(Boards.fieldClasses.ship))
+                fields[i].removeClass(Boards.fieldClasses.empty).addClass(Boards.fieldClasses.illicit);
+        }
+
         let noCoords = true;
-        for (let i = ship.length - 1; i >= 0; i--) {
+        let i;
+        for (i = ship.length - 1; i >= 0; i--) {
             if (ship[i] !== null) {
                 noCoords = false;
                 break;
@@ -103,73 +123,96 @@ class Mechanism extends Base {
         }
 
         if (noCoords) {
+            // new ship to be placed
+            console.log('new ship to be placed');
             return;
         } else {
-            // determine ship Direction
+            if (i + 1 === 1) {
+                this.renderValidFields(this.findNeighboursAround(ship[i]));
+            } else {
+                this.renderValidFields(this.findNeighboursInLine(ship));
+            }
         }
-
 
 
         return false;
     }
 
-    findNeighboursInLine(xy, ship) {
-        console.log('findNeighboursInLine');
-        let lastXY;
-
-        for (let i = ship.length - 1; i >= 0; i--) {
-            if (ship[i] !== null) {
-                lastXY = ship[i];
-                break;
-            }
+    updateFields(fields, classToHave, classToRemove, classToAdd) {
+        if (!fields.hasClass(Boards.fieldClasses[classToHave])) {
+            fields.removeClass(Boards.fieldClasses[classToRemove]).addClass(Boards.fieldClasses[classToAdd]);
         }
-        console.log(lastXY, xy);
-        if (lastXY[0] === xy[0]) {
-            if (this.shipDirection === 'horizontal') {
-                this.alert('Cannot change ship direction');
-                return {result: false, reason: 'invalid-ship-placement'}
-            }
-            this.shipDirection = 'vertical';
-        } else {
-            if (this.shipDirection === 'vertical') {
-                this.alert('Cannot change ship direction');
-                return {result: false, reason: 'invalid-ship-placement'}
-            }
-            this.shipDirection = 'horizontal';
-        }
-
-        console.log(this.shipDirection);
-        let array = [];
-
-        ship.map(point => {
-            // map findNeighboursAround for each point other than null
-        });
-        return this.findNeighboursAround(xy);
     }
 
-    findNeighboursAround(xy) {
+    renderValidFields(array) {
+        array.map(field => {
+            if (field) {
+                if (typeof field !== 'string') { // if array actually consists of arrays of coords
+                    field.map(element => {
+                        this.updateFields(this.class(element)[0], 'ship', 'illicit', 'empty');
+                    });
+                } else { // if it's just one coord
+                    this.updateFields(this.class(field)[0], 'ship', 'illicit', 'empty');
+                }
+            }
+        });
+    }
+
+    findNeighboursInLine(ship) {
+        this.shipDirection = this.determineDirection(ship);
+        let array = [];
+        ship.map(point => {
+            if (point) {
+                array.push(this.findNeighboursAround(point, this.shipDirection));
+            }
+        });
+        return array;
+    }
+
+    determineDirection(ship) {
+        let x, y;
+        for (let i = 0; i < ship.length; i++) {
+            if (ship[i]) {
+                if (x && y) {
+                    if (x !== ship[i][0]) {
+                        return 'horizontal';
+                    } else {
+                        return 'vertical';
+                    }
+                }
+                x = ship[i][0];
+                y = ship[i][1];
+            }
+        }
+    }
+
+    findNeighboursAround(xy, direction) {
         let array = [];
         let x = xy.slice(0, 1);
         let y = xy.slice(1);
 
-        if (y !== '1') {
-            array.push(Boards.letters[Boards.letters.indexOf(x)] + (parseInt(y) - 1));
+        if (typeof direction === 'undefined' || direction === 'vertical') {
+            if (y !== '1') {
+                array.push(Boards.letters[Boards.letters.indexOf(x)] + (parseInt(y) - 1));
+            }
+            if (y !== '10') {
+                array.push(Boards.letters[Boards.letters.indexOf(x)] + (parseInt(y) + 1));
+            }
         }
-        if (y !== '10') {
-            array.push(Boards.letters[Boards.letters.indexOf(x)] + (parseInt(y) + 1));
-        }
-        if (x !== 'A') {
-            array.push(Boards.letters[Boards.letters.indexOf(x) - 1] + y);
-        }
-        if (x !== 'J') {
-            array.push(Boards.letters[Boards.letters.indexOf(x) + 1] + y);
+        if (typeof direction === 'undefined' || direction === 'horizontal') {
+            if (x !== 'A') {
+                array.push(Boards.letters[Boards.letters.indexOf(x) - 1] + y);
+            }
+            if (x !== 'J') {
+                array.push(Boards.letters[Boards.letters.indexOf(x) + 1] + y);
+            }
         }
         return array;
     }
 
     createCurrentShipToPlace() {
         for (let i = 0; i < this.currentShip; i++) {
-            let field = document.createElement('div').addClass(['field', Boards.fieldClasses['ship']]);
+            let field = document.createElement('div').addClass(['field', Boards.fieldClasses.ship]);
             Boards.shipHolder.append(field);
         }
     }

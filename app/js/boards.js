@@ -8,6 +8,7 @@ class Boards extends Base {
         this.ai = {};
         this.fieldState = {illicit: 'illicit', empty: 'empty', miss: 'miss', ship: 'ship', hit: 'hit', sunk: 'sunk'};
         this.fieldClasses = this.createFieldClasses();
+        this.fieldClassesArray = this.createFieldClasses(true);
     }
 
     create() {
@@ -16,14 +17,24 @@ class Boards extends Base {
         console.info('INFO: Boards rendered.');
     }
 
-    createFieldClasses() {
-        let object = {};
+    createFieldClasses(createArray = false) {
+        if (!createArray) {
+            let object = {};
 
-        for (let key in this.fieldState) {
-            object[key] = `field--${key}`;
+            for (let key in this.fieldState) {
+                object[key] = `field--${key}`;
+            }
+
+            return object;
+        } else {
+            let array = [];
+
+            for (let key in this.fieldState) {
+                array.push(`field--${key}`);
+            }
+
+            return array;
         }
-
-        return object;
     }
 
     initBoard(name) {
