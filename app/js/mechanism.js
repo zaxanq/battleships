@@ -8,14 +8,10 @@ class Mechanism extends Base {
     }
 
     start() {
-        this.init();
-        this.addListeners();
-        this.gameStart();
-    }
-
-    init() {
         this.initAlerts();
         this.initShips();
+        this.addListeners();
+        this.gameStart();
     }
 
     initAlerts() {
@@ -47,22 +43,27 @@ class Mechanism extends Base {
         [...this.DOM('.board-player > .row > .field')].map(field => {
             field.addEventListener('click', () => {
                 if (this.gameStatus === 1) {
-                    this.placeShip(field.classList[1]);
+                    this.placeShip(field);
                 }
             });
         });
         console.info('INFO: Listeners added.');
     }
 
-    placeShip(xy) {
+    gameStart() {
+        // this.alert('Game starts.\nYour board is on the left.\nPlease place your ships.')
+    }
+
+    placeShip(field) {
+        let coords = field.classList[1];
         for (let size = 0; size < 5 - this.currentShip + 1; size++) {
             for (let position = 0; position < 5 - size + 1; position++) {
                 if (this.playerShips[this.currentShip][size][position] === null) {
-                    let validation = this.validateField(xy);
+                    let validation = this.validateField(field);
                     if (validation.result) {
-                        this.changeField('player', xy, Boards.fieldClasses.ship);
-                        this.playerShips[this.currentShip][size][position] = xy;
-                        Boards.player.field[xy] = Boards.fieldState.ship;
+                        this.changeField(field, Boards.fieldClasses.ship);
+                        this.playerShips[this.currentShip][size][position] = coords;
+                        Boards.player.field[coords] = Boards.fieldState.ship;
 
                         this.renderIllicitFields(this.playerShips[this.currentShip][size]);
                     } else {
@@ -86,18 +87,18 @@ class Mechanism extends Base {
         }
     }
 
-    validateField(coords) {
-        if (this.class(coords)[0].classList.contains(Boards.fieldClasses.ship)) {
+    validateField(field) {
+        if (field.hasClass(Boards.fieldClasses.ship)) {
             return {result: false, reason: 'ship-already-placed'};
         }
-        if (this.class(coords)[0].classList.contains(Boards.fieldClasses.illicit)) {
+        if (field.hasClass(Boards.fieldClasses.illicit)) {
             return {result: false, reason: 'illicit-field'};
         }
         return {result: true};
     }
 
-    changeField(board, coords, state) {
-        this.DOM(`.board-${board} .${coords}`)[0].removeClass(Boards.fieldClassesArray).addClass(state);
+    changeField(field, state) {
+        field.removeClass(Boards.fieldClassesArray).addClass(state);
     }
 
     renderIllicitFieldsAroundShips() {
@@ -118,13 +119,17 @@ class Mechanism extends Base {
     }
 
     clearBoard(fieldState) {
-        let toRemove;
-        if (fieldState === 'empty') toRemove = 'illicit';
-        else toRemove = 'empty';
+        let toRemove = fieldState === 'empty' ? 'illicit' : 'empty';
 
         let fields = this.DOM(`.board-player > .row > .${Boards.fieldClasses[toRemove]}`);
         for (let i = 0; i < fields.length; i++) {
-            this.updateField(fields[i], 'ship', toRemove, fieldState);
+            this.updateField(fields[i], this.fieldsToNotClear, toRemove, fieldState);
+        }
+    }
+
+    updateField(field, fieldClassToNotHave, fieldClassToRemove, fieldClassToAdd) {
+        if (!field.hasClass(Boards.fieldClasses[fieldClassToNotHave])) {
+            field.removeClass(Boards.fieldClasses[fieldClassToRemove]).addClass(Boards.fieldClasses[fieldClassToAdd]);
         }
     }
 
@@ -143,13 +148,6 @@ class Mechanism extends Base {
         } else {
             this.renderValidFields(this.findNeighboursInLine(ship));
         }
-        return false;
-    }
-
-    updateField(field, fieldClassToNotHave, fieldClassToRemove, fieldClassToAdd) {
-        if (!field.hasClass(Boards.fieldClasses[fieldClassToNotHave])) {
-            field.removeClass(Boards.fieldClasses[fieldClassToRemove]).addClass(Boards.fieldClasses[fieldClassToAdd]);
-        }
     }
 
     renderValidFields(array) {
@@ -164,6 +162,30 @@ class Mechanism extends Base {
                 }
             }
         });
+    }
+
+    findNeighboursAround(coords, direction) {
+        let array = [];
+        let x = coords.slice(0, 1);
+        let y = coords.slice(1);
+
+        if (typeof direction === 'undefined' || direction === 'vertical') {
+            if (y !== '1') {
+                array.push(Boards.letters[Boards.letters.indexOf(x)] + (parseInt(y) - 1));
+            }
+            if (y !== '10') {
+                array.push(Boards.letters[Boards.letters.indexOf(x)] + (parseInt(y) + 1));
+            }
+        }
+        if (typeof direction === 'undefined' || direction === 'horizontal') {
+            if (x !== 'A') {
+                array.push(Boards.letters[Boards.letters.indexOf(x) - 1] + y);
+            }
+            if (x !== 'J') {
+                array.push(Boards.letters[Boards.letters.indexOf(x) + 1] + y);
+            }
+        }
+        return array;
     }
 
     findNeighboursInLine(ship) {
@@ -227,30 +249,6 @@ class Mechanism extends Base {
         }
     }
 
-    findNeighboursAround(xy, direction) {
-        let array = [];
-        let x = xy.slice(0, 1);
-        let y = xy.slice(1);
-
-        if (typeof direction === 'undefined' || direction === 'vertical') {
-            if (y !== '1') {
-                array.push(Boards.letters[Boards.letters.indexOf(x)] + (parseInt(y) - 1));
-            }
-            if (y !== '10') {
-                array.push(Boards.letters[Boards.letters.indexOf(x)] + (parseInt(y) + 1));
-            }
-        }
-        if (typeof direction === 'undefined' || direction === 'horizontal') {
-            if (x !== 'A') {
-                array.push(Boards.letters[Boards.letters.indexOf(x) - 1] + y);
-            }
-            if (x !== 'J') {
-                array.push(Boards.letters[Boards.letters.indexOf(x) + 1] + y);
-            }
-        }
-        return array;
-    }
-
     createCurrentShipToPlace() {
         for (let i = 0; i < this.currentShip; i++) {
             let field = document.createElement('div').addClass(['field', Boards.fieldClasses.ship]);
@@ -282,11 +280,6 @@ class Mechanism extends Base {
         this.class('ship-holder')[0].remove();
         this.class('board-player')[0].addClass('blocked');
         this.alert('Placing Ai ships.');
-    }
-
-
-    gameStart() {
-        // this.alert('Game starts.\nYour board is on the left.\nPlease place your ships.')
     }
 }
 
