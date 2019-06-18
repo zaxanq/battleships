@@ -200,27 +200,29 @@ class Mechanism extends Base {
     }
 
     findNeighboursInCorners(ship, array) {
-            array.push(this.move(ship[0], 'UL'));
-            array.push(this.move(ship[ship.length - 1], 'DR'));
-            array.push(this.move(ship[ship.length - 1], 'UR'));
+        array.push(this.move(ship[0], 'UL'));
+        array.push(this.move(ship[ship.length - 1], 'DR'));
 
         if (this.shipDirection === 'horizontal') {
             array.push(this.move(ship[0], 'DL'));
+            array.push(this.move(ship[ship.length - 1], 'UR'));
         } else {
             array.push(this.move(ship[0], 'UR'));
+            array.push(this.move(ship[ship.length - 1], 'DL'));
         }
+
         return array;
     }
 
     move(coords, direction) {
         if (direction === 'U') {
-            return coords[0] + (parseInt(coords[1]) - 1);
+            return coords[0] + (parseInt(coords.slice(1)) - 1);
         } else if (direction === 'D') {
-            return coords[0] + (parseInt(coords[1]) + 1);
+            return coords[0] + (parseInt(coords.slice(1)) + 1);
         } else if (direction === 'L') {
-            return Boards.letters[Boards.letters.indexOf(coords[0]) - 1] + coords[1];
+            return Boards.letters[Boards.letters.indexOf(coords[0]) - 1] + coords.slice(1);
         } else if (direction === 'R') {
-            return Boards.letters[Boards.letters.indexOf(coords[0]) + 1] + coords[1];
+            return Boards.letters[Boards.letters.indexOf(coords[0]) + 1] + coords.slice(1);
         } else if (direction === 'UL') {
             return this.move(this.move(coords, 'U'), 'L');
         } else if (direction === 'UR') {
