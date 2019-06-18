@@ -6,7 +6,7 @@ class Boards extends Base {
         this.main = this.class('main-container')[0];
         this.player = {};
         this.ai = {};
-        this.fieldState = {illicit: 'illicit', empty: 'empty', miss: 'miss', ship: 'ship', hit: 'hit', sunk: 'sunk'};
+        this.fieldState = {illicit: 'illicit', empty: 'empty', miss: 'miss', ship: 'ship', hit: 'hit', sunk: 'sunk', neighbour: 'neighbour'};
         this.fieldClasses = this.createFieldClasses();
         this.fieldClassesArray = this.createFieldClasses(true);
     }

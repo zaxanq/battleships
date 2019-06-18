@@ -37,6 +37,26 @@ class Base {
             return this;
         };
 
+        Element.prototype.doesntHaveClass = function (className) {
+            if (typeof className === 'string') {
+                return !this.classList.contains(className);
+            } else if (typeof className === 'object') {
+                if (className.length) {
+                    for (let i = 0; i < className.length; i++) {
+                        if (this.classList.contains(className[i])) {
+                            return false;
+                        }
+                    }
+                    return true;
+                } else {
+                    console.error('Parameter needs to be a string or a array of strings');
+                }
+            } else {
+                console.error('Parameter needs to be a string or a array of strings');
+            }
+            return this;
+        };
+
         Element.prototype.removeClass = function (className) {
             if (typeof className === 'string') {
                 this.classList.remove(className);

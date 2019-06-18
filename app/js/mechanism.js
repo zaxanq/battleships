@@ -114,21 +114,21 @@ class Mechanism extends Base {
         this.findNeighboursInCorners(shipsCoords, areaAroundShips);
 
         for (let i = 0; i < areaAroundShips.length; i++) {
-            this.updateField(this.class(areaAroundShips[i])[0], 'ship', 'empty', 'illicit');
+            this.updateField(this.class(areaAroundShips[i])[0], Boards.fieldState.empty, Boards.fieldState.neighbour);
         }
     }
 
     clearBoard(fieldState) {
-        let toRemove = fieldState === 'empty' ? 'illicit' : 'empty';
-
+        let toRemove = fieldState === Boards.fieldState.empty ? Boards.fieldState.illicit : Boards.fieldState.empty;
         let fields = this.DOM(`.board-player > .row > .${Boards.fieldClasses[toRemove]}`);
+
         for (let i = 0; i < fields.length; i++) {
-            this.updateField(fields[i], this.fieldsToNotClear, toRemove, fieldState);
+            this.updateField(fields[i], toRemove, fieldState);
         }
     }
 
-    updateField(field, fieldClassToNotHave, fieldClassToRemove, fieldClassToAdd) {
-        if (!field.hasClass(Boards.fieldClasses[fieldClassToNotHave])) {
+    updateField(field, fieldClassToRemove, fieldClassToAdd) {
+        if (field.doesntHaveClass(Boards.fieldClassesArray.slice(2))) {
             field.removeClass(Boards.fieldClasses[fieldClassToRemove]).addClass(Boards.fieldClasses[fieldClassToAdd]);
         }
     }
@@ -155,10 +155,10 @@ class Mechanism extends Base {
             if (field) {
                 if (typeof field !== 'string') { // if array actually consists of arrays of coords
                     field.map(element => {
-                        this.updateField(this.class(element)[0], 'ship', 'illicit', 'empty');
+                        this.updateField(this.class(element)[0], Boards.fieldState.illicit, Boards.fieldState.empty);
                     });
                 } else { // if it's just one coord
-                    this.updateField(this.class(field)[0], 'ship', 'illicit', 'empty');
+                    this.updateField(this.class(field)[0], Boards.fieldState.illicit, Boards.fieldState.empty);
                 }
             }
         });
