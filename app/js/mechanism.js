@@ -230,18 +230,29 @@ class Mechanism extends Base {
     }
 
     findNeighboursInCorners(ship, array) {
-        array.push(this.move(ship[0], 'UL'));
-        array.push(this.move(ship[ship.length - 1], 'DR'));
+        let [start, end] = this.findShipEnds(ship);
+        array.push(this.move(start, 'UL'));
+        array.push(this.move(end, 'DR'));
 
         if (this.shipDirection === 'horizontal') {
-            array.push(this.move(ship[0], 'DL'));
-            array.push(this.move(ship[ship.length - 1], 'UR'));
+            array.push(this.move(start, 'DL'));
+            array.push(this.move(end, 'UR'));
         } else {
-            array.push(this.move(ship[0], 'UR'));
-            array.push(this.move(ship[ship.length - 1], 'DL'));
+            array.push(this.move(start, 'UR'));
+            array.push(this.move(end, 'DL'));
         }
 
         return array;
+    }
+
+    findShipEnds(ship) {
+        if (this.shipDirection === 'horizontal') {
+            let shipXs = ship.map(shipField => Boards.letters.indexOf(shipField[0]));
+            return [Boards.letters[Math.min(...shipXs)] + ship[0].slice(1), Boards.letters[Math.max(...shipXs)] + ship[0].slice(1)];
+        } else {
+            let shipYs = ship.map(shipField => parseInt(shipField.slice(1)));
+            return [ship[1][0] + Math.min(...shipYs), ship[1][0] + Math.max(...shipYs)];
+        }
     }
 
     move(coords, direction) {
