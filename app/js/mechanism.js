@@ -38,15 +38,15 @@ class Mechanism extends Base {
         this.playerShips = this.assertShips();
         this.aiShips = this.assertShips();
 
-        this.currentShip = {size: 5, number: 0};
+        this.currentShip = {size: 4, number: 0};
         this.placedShips = [];
         this.createCurrentShipToPlace();
     }
 
     defineShips() {
         this.ships = {};
-        for (let i = 0; i < 5; i++) {
-            this.ships[5 - i] = i + 1;
+        for (let i = 0; i < 4; i++) {
+            this.ships[4 - i] = i + 1;
         }
     }
 
@@ -67,8 +67,8 @@ class Mechanism extends Base {
 
     placeShip(field) {
         let coords = field.classList[1];
-        for (let size = 0; size < 5 - this.currentShip.size + 1; size++) {
-            for (let position = 0; position < 5 - size + 1; position++) {
+        for (let size = 0; size < 4 - this.currentShip.size + 1; size++) {
+            for (let position = 0; position < 4 - size + 1; position++) {
                 if (this.playerShips[this.currentShip.size][size][position] === null) {
                     let validation = this.validateField(field);
                     if (validation.result) {
@@ -119,26 +119,18 @@ class Mechanism extends Base {
     renderIllicitFieldsAroundShips() {
         this.clearBoard(Boards.fieldState.empty);
 
-        // let ships = [...this.DOM(`.board-player > .row > .${Boards.fieldClasses.ship}`)];
-        // let shipsCoords = ships.map(ship => ship.classList[1]);
         let areaAroundShips = [];
-
-        for (let ship = 5; ship > 0; ship--) {
-            for (let size = 0; size < 5 - ship + 1; size++) {
+        for (let ship = 4; ship > 0; ship--) {
+            for (let size = 0; size < 4 - ship + 1; size++) {
                 if (this.playerShips[ship][size][0] !== null) {
                     for (let position = 0; position < ship; position++) {
-                        log(ship - size, ship, size);
                         this.joinArrays(areaAroundShips, this.findNeighboursAround(this.playerShips[ship][size][position]));
                         this.findNeighboursInCorners(this.playerShips[ship][size], areaAroundShips);
                     }
                 }
             }
         }
-        // for (let i = 0; i < shipsCoords.length; i++) {
-        //     this.joinArrays(areaAroundShips, this.findNeighboursAround(shipsCoords[i]));
-        // }
-        // this.findNeighboursInCorners(shipsCoords, areaAroundShips);
-        //
+
         for (let i = 0; i < areaAroundShips.length; i++) {
             this.updateField(this.class(areaAroundShips[i])[0], Boards.fieldState.empty, Boards.fieldState.neighbour);
         }
@@ -308,7 +300,7 @@ class Mechanism extends Base {
 
     assertShips() {
         let ships = {};
-        let n = 5;
+        let n = 4;
         for (let i = 1; i <= n; i++) {
             ships[i] = [];
             for (let j = 0; j < (n - i + 1); j++) {
