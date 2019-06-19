@@ -31,12 +31,20 @@ class Mechanism extends Base {
 
     initShips() {
         this.gameStatus = 1; // ship placement started
+        this.defineShips();
         this.playerShips = this.assertShips();
         this.aiShips = this.assertShips();
 
-        this.currentShip = 5;
+        this.currentShip = {size: 5, number: 0};
         this.placedShips = [];
         this.createCurrentShipToPlace();
+    }
+
+    defineShips() {
+        this.ships = {};
+        for (let i = 0; i < 5; i++) {
+            this.ships[5 - i] = i + 1;
+        }
     }
 
     addListeners() {
@@ -56,25 +64,30 @@ class Mechanism extends Base {
 
     placeShip(field) {
         let coords = field.classList[1];
-        for (let size = 0; size < 5 - this.currentShip + 1; size++) {
+        for (let size = 0; size < 5 - this.currentShip.size + 1; size++) {
             for (let position = 0; position < 5 - size + 1; position++) {
-                if (this.playerShips[this.currentShip][size][position] === null) {
+                if (this.playerShips[this.currentShip.size][size][position] === null) {
                     let validation = this.validateField(field);
                     if (validation.result) {
                         this.changeField(field, Boards.fieldClasses.ship);
-                        this.playerShips[this.currentShip][size][position] = coords;
+                        this.playerShips[this.currentShip.size][size][position] = coords;
                         Boards.player.field[coords] = Boards.fieldState.ship;
 
-                        this.renderIllicitFields(this.playerShips[this.currentShip][size]);
+                        this.renderIllicitFields(this.playerShips[this.currentShip.size][size]);
                     } else {
                         position--;
                         this.alert(validation.reason);
                     }
 
-                    if (size === 5 - this.currentShip && position === this.currentShip - 1) {
-                        this.placedShips.push(this.currentShip);
-                        this.currentShip--;
-                        if (this.currentShip === 0) {
+                    if (position === this.currentShip.size - 1) {
+                        this.currentShip.number++;
+                        console.log(this.currentShip, this.ships[this.currentShip.size]);
+                        if (this.currentShip.number === this.ships[this.currentShip.size]) {
+                            this.placedShips.push(this.currentShip.size);
+                            this.currentShip.size--;
+                            this.currentShip.number = 0;
+                        }
+                        if (this.currentShip.size === 0) {
                             this.assertAiShips();
                         } else {
                             this.updateCurrentShipToPlace();
@@ -252,7 +265,7 @@ class Mechanism extends Base {
     }
 
     createCurrentShipToPlace() {
-        for (let i = 0; i < this.currentShip; i++) {
+        for (let i = 0; i < this.currentShip.size; i++) {
             let field = document.createElement('div').addClass(['field', Boards.fieldClasses.ship]);
             Boards.shipHolder.append(field);
         }
