@@ -1,6 +1,9 @@
 const Base = require('./base');
 const Boards = require('./boards');
 
+const log = console.log;
+const info = console.info;
+
 class Mechanism extends Base {
     constructor() {
         super();
@@ -21,7 +24,7 @@ class Mechanism extends Base {
             event.stopPropagation();
             this.alertOverlay.removeClass('visible');
         });
-        console.info('INFO: Alerts loaded.');
+        info('INFO: Alerts loaded.');
     }
 
     alert(msg) {
@@ -55,7 +58,7 @@ class Mechanism extends Base {
                 }
             });
         });
-        console.info('INFO: Listeners added.');
+        info('INFO: Listeners added.');
     }
 
     gameStart() {
@@ -81,7 +84,6 @@ class Mechanism extends Base {
 
                     if (position === this.currentShip.size - 1) {
                         this.currentShip.number++;
-                        console.log(this.currentShip, this.ships[this.currentShip.size]);
                         if (this.currentShip.number === this.ships[this.currentShip.size]) {
                             this.placedShips.push(this.currentShip.size);
                             this.currentShip.size--;
@@ -117,15 +119,26 @@ class Mechanism extends Base {
     renderIllicitFieldsAroundShips() {
         this.clearBoard(Boards.fieldState.empty);
 
-        let ships = [...this.DOM(`.board-player > .row > .${Boards.fieldClasses.ship}`)];
-        let shipsCoords = ships.map(ship => ship.classList[1]);
+        // let ships = [...this.DOM(`.board-player > .row > .${Boards.fieldClasses.ship}`)];
+        // let shipsCoords = ships.map(ship => ship.classList[1]);
         let areaAroundShips = [];
 
-        for (let i = 0; i < shipsCoords.length; i++) {
-            this.joinArrays(areaAroundShips, this.findNeighboursAround(shipsCoords[i]));
+        for (let ship = 5; ship > 0; ship--) {
+            for (let size = 0; size < 5 - ship + 1; size++) {
+                if (this.playerShips[ship][size][0] !== null) {
+                    for (let position = 0; position < ship; position++) {
+                        log(ship - size, ship, size);
+                        this.joinArrays(areaAroundShips, this.findNeighboursAround(this.playerShips[ship][size][position]));
+                        this.findNeighboursInCorners(this.playerShips[ship][size], areaAroundShips);
+                    }
+                }
+            }
         }
-        this.findNeighboursInCorners(shipsCoords, areaAroundShips);
-
+        // for (let i = 0; i < shipsCoords.length; i++) {
+        //     this.joinArrays(areaAroundShips, this.findNeighboursAround(shipsCoords[i]));
+        // }
+        // this.findNeighboursInCorners(shipsCoords, areaAroundShips);
+        //
         for (let i = 0; i < areaAroundShips.length; i++) {
             this.updateField(this.class(areaAroundShips[i])[0], Boards.fieldState.empty, Boards.fieldState.neighbour);
         }
