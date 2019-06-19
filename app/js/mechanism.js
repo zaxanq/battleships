@@ -141,7 +141,7 @@ class Mechanism extends Base {
     }
 
     updateField(field, fieldClassToRemove, fieldClassToAdd) {
-        if (field.doesntHaveClass(Boards.fieldClassesArray.slice(2))) {
+        if (field && field.doesntHaveClass(Boards.fieldClassesArray.slice(2))) {
             field.removeClass(Boards.fieldClasses[fieldClassToRemove]).addClass(Boards.fieldClasses[fieldClassToAdd]);
         }
     }
@@ -177,24 +177,36 @@ class Mechanism extends Base {
         });
     }
 
+    checkCoord(coord, direction) {
+        if (direction === 'L' && coord !== Boards.letters[0]) {
+            return true;
+        } else if (direction === 'R' && coord !== Boards.letters[9]) {
+            return true;
+        } else if (direction === 'U' && coord !== 1) {
+            return true;
+        } else if (direction === 'D' && coord !== 10) {
+            return true;
+        }
+    }
+
     findNeighboursAround(coords, direction) {
         let array = [];
         let x = coords.slice(0, 1);
-        let y = coords.slice(1);
+        let y = parseInt(coords.slice(1));
 
         if (typeof direction === 'undefined' || direction === 'vertical') {
-            if (y !== '1') {
-                array.push(Boards.letters[Boards.letters.indexOf(x)] + (parseInt(y) - 1));
+            if (this.checkCoord(y, 'U')) {
+                array.push(Boards.letters[Boards.letters.indexOf(x)] + (y - 1));
             }
-            if (y !== '10') {
-                array.push(Boards.letters[Boards.letters.indexOf(x)] + (parseInt(y) + 1));
+            if (this.checkCoord(y, 'D')) {
+                array.push(Boards.letters[Boards.letters.indexOf(x)] + (y + 1));
             }
         }
         if (typeof direction === 'undefined' || direction === 'horizontal') {
-            if (x !== 'A') {
+            if (this.checkCoord(x, 'L')) {
                 array.push(Boards.letters[Boards.letters.indexOf(x) - 1] + y);
             }
-            if (x !== 'J') {
+            if (this.checkCoord(x, 'R')) {
                 array.push(Boards.letters[Boards.letters.indexOf(x) + 1] + y);
             }
         }
@@ -228,22 +240,27 @@ class Mechanism extends Base {
     }
 
     move(coords, direction) {
-        if (direction === 'U') {
-            return coords[0] + (parseInt(coords.slice(1)) - 1);
-        } else if (direction === 'D') {
-            return coords[0] + (parseInt(coords.slice(1)) + 1);
-        } else if (direction === 'L') {
-            return Boards.letters[Boards.letters.indexOf(coords[0]) - 1] + coords.slice(1);
-        } else if (direction === 'R') {
-            return Boards.letters[Boards.letters.indexOf(coords[0]) + 1] + coords.slice(1);
-        } else if (direction === 'UL') {
-            return this.move(this.move(coords, 'U'), 'L');
-        } else if (direction === 'UR') {
-            return this.move(this.move(coords, 'U'), 'R');
-        } else if (direction === 'DL') {
-            return this.move(this.move(coords, 'D'), 'L');
-        } else if (direction === 'DR') {
-            return this.move(this.move(coords, 'D'), 'R');
+        if (coords) {
+            let x = coords[0];
+            let y = parseInt(coords.slice(1));
+
+            if (direction === 'U' && this.checkCoord(y, direction)) {
+                return x + (y - 1);
+            } else if (direction === 'D' && this.checkCoord(y, direction)) {
+                return x + (y + 1);
+            } else if (direction === 'L' && this.checkCoord(x, direction)) {
+                return Boards.letters[Boards.letters.indexOf(x) - 1] + y;
+            } else if (direction === 'R' && this.checkCoord(x, direction)) {
+                return Boards.letters[Boards.letters.indexOf(x) + 1] + y;
+            } else if (direction === 'UL') {
+                return this.move(this.move(coords, 'U'), 'L');
+            } else if (direction === 'UR') {
+                return this.move(this.move(coords, 'U'), 'R');
+            } else if (direction === 'DL') {
+                return this.move(this.move(coords, 'D'), 'L');
+            } else if (direction === 'DR') {
+                return this.move(this.move(coords, 'D'), 'R');
+            }
         }
     }
 
