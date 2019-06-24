@@ -18,6 +18,9 @@ class Boards extends Base {
     }
 
     createFieldClasses(createArray = false) {
+        /* Creates an object or array (depending on the parameter) with the field classes depending on this.fieldState
+            object. Object contains elements as pair "state: 'field--state'" while array contains only "field--state". */
+
         if (!createArray) {
             let object = {};
 
@@ -38,6 +41,9 @@ class Boards extends Base {
     }
 
     initBoard(name) {
+        /* Creates a board according tothe parameter. Function is executed twice to create 2 boards.
+            Method executes 2 other functions that create rows and field in the board as well as labels. */
+
         let board = document.createElement('div');
         board.addClass(['board', 'board-' + name]);
         this.main.append(board);
@@ -53,6 +59,9 @@ class Boards extends Base {
     }
 
     createFields(board) {
+        /* Method creates 10 rows and in each row creates 10 fields. Rows are named row-1, row-2,...
+            while fields are names A1, B1,... Each field is given an empty state class and board.name class. */
+
         this.letters = 'ABCDEFGHIJ';
         board.field = {};
         for (let i = 1; i <= 10; i++) {
@@ -68,6 +77,8 @@ class Boards extends Base {
     }
 
     createLabels(board) {
+        /* This method adds labels (A, B, C,.. & 1, 2, 3,...) displayed outside the board. */
+
         let horizontalLabels = document.createElement('div').addClass('label-container--horizontal');
         let verticalLabels = document.createElement('div').addClass('label-container--vertical');
         board.DOM.board.append(horizontalLabels);
@@ -86,6 +97,8 @@ class Boards extends Base {
     }
 
     createShipHolder() {
+        /* Initializes the current-ship panel that is later shown with Mechanism.creatCurrentShipToPlace() method. */
+
         let shipHolderWrapper = document.createElement('div').addClass('ship-holder');
         this.player.DOM.board.prepend(shipHolderWrapper);
 
