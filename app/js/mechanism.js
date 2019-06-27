@@ -167,25 +167,28 @@ class Mechanism extends Base {
         }
     }
 
-    clearBoard(fieldState) {
+    clearBoard(fieldState, toRemove = '', forced = false) {
         /* Method gets a fieldState parameter. Then based on this parameter it sets a toRemove variable to either
            illicit or empty state. The method then selects all players board fields and removes toRemove state class
-           and adds the other state.
+           and adds the other state. If toRemove is empty, it will be established based on fieldState.
            In short, the method changes state of all available fields to either illicit or empty. */
 
-        let toRemove = fieldState === Boards.fieldState.empty ? Boards.fieldState.illicit : Boards.fieldState.empty;
+        if (!toRemove) toRemove = fieldState === Boards.fieldState.empty ? Boards.fieldState.illicit : Boards.fieldState.empty;
+        else this.clearBoard(fieldState); // clear from empty/illicit, then from given toRemove status.
         let fields = this.DOM(`.board-player > .row > .${Boards.fieldClasses[toRemove]}`);
 
         for (let i = 0; i < fields.length; i++) {
-            this.updateField(fields[i], toRemove, fieldState);
+            this.updateField(fields[i], toRemove, fieldState, forced);
         }
     }
 
-    updateField(field, fieldClassToRemove, fieldClassToAdd) {
+    updateField(field, fieldClassToRemove, fieldClassToAdd, forced = false) {
         /* This method updates 'field' by removing 'fieldClassToRemove' and adding 'fieldClassToAdd'
             but only if this field exists and it's state is either 'empty' or 'illicit'. */
-
-        if (field && field.doesntHaveClass(Boards.fieldClassesArray.slice(2))) {
+        let keep;
+        if (forced) keep = Boards.fieldClassesArray.slice(2,Boards.fieldClassesArray.length-1);
+        else keep = Boards.fieldClassesArray.slice(2);
+        if (field && field.doesntHaveClass(keep)) {
             field.removeClass(Boards.fieldClasses[fieldClassToRemove]).addClass(Boards.fieldClasses[fieldClassToAdd]);
         }
     }
@@ -286,7 +289,7 @@ class Mechanism extends Base {
         /* Finds neighbours in corners of the ship. The corner to select is always at least Up-Left & Down-Right.
             Then the other 2 depend on the direction of the ship. */
 
-        let [start, end] = this.findShipEnds(ship);
+        let [start, end] = this.currentShip.size === 1 ? [ship[0], ship[0]] : this.findShipEnds(ship);
         array.push(this.move(start, 'UL'));
         array.push(this.move(end, 'DR'));
 
@@ -398,9 +401,10 @@ class Mechanism extends Base {
         /* This method executes a removal of current ship panel of player's board, blocks player's board and displays
             information that ai ships placing is now happening.
             It is executed when player finished placing his/her ships. */
-
+        this.clearBoard(Boards.fieldState.empty, Boards.fieldState.neighbour, true);
         this.class('ship-holder')[0].remove();
         this.class('board-player')[0].addClass('blocked');
+        info('INFO: Ship placement finished');
         this.alert('Placing Ai ships.');
     }
 }
