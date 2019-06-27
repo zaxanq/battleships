@@ -1,5 +1,6 @@
 const Base = require('./base');
 const Boards = require('./boards');
+const AI = require('./ai');
 const Mechanism = require('./mechanism');
 
 class Game extends Base {
@@ -12,8 +13,6 @@ class Game extends Base {
         Boards.create();
         Mechanism.start();
     }
-
-
 }
 
 (new Game).init();

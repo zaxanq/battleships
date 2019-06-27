@@ -1,5 +1,6 @@
 const Base = require('./base');
 const Boards = require('./boards');
+const AI = require('./ai');
 
 const log = console.log;
 const info = console.info;
@@ -85,7 +86,7 @@ class Mechanism extends Base {
         // this.alert('Game starts.\nYour board is on the left.\nPlease place your ships.')
     }
 
-    placeShip(field) {
+    placeShip(field, invisible = false) {
         /* This method verifies if the given field (a html DOM object) is empty.
             Method checks if playerShips object contains a ship in given field
             and uses validateField to determine whether the field is available. */
@@ -98,7 +99,7 @@ class Mechanism extends Base {
                     let validation = this.validateField(field);
 
                     if (validation.result) {
-                        this.changeField(field, Boards.fieldClasses.ship);
+                        if (!invisible) this.changeField(field, Boards.fieldClasses.ship);
                         this.playerShips[this.currentShip.size][size][position] = coords;
                         Boards.player.field[coords] = Boards.fieldState.ship;
 
@@ -404,11 +405,17 @@ class Mechanism extends Base {
             information that ai ships placing is now happening.
             It is executed when player finished placing his/her ships. */
         this.clearBoard(Boards.fieldState.empty, Boards.fieldState.neighbour, true);
+
         this.class('ship-holder')[0].remove();
         this.class('board-player')[0].addClass('blocked');
+
         this.gameStatus = 2;
+
         info('INFO: Ship placement finished');
         this.alert('Placing Ai ships.');
+
+        AI.init(this.aiShips);
+
     }
 }
 
