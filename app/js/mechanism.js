@@ -7,7 +7,7 @@ const info = console.info;
 class Mechanism extends Base {
     constructor() {
         super();
-            /* 0 = not started   1 = ship placement   2 = game started   3 = game finished */
+            /* 0 = not started   1 = ship placement   2 = ai ship placement   3 = game started   4 = game finished */
         this.gameStatus = 0;
     }
 
@@ -71,6 +71,8 @@ class Mechanism extends Base {
             field.addEventListener('click', () => {
                 if (this.gameStatus === 1) {
                     this.placeShip(field);
+                } else if (this.gameStatus === 2) {
+                    this.alert('You cannot touch the board at this stage.');
                 }
             });
         });
@@ -404,6 +406,7 @@ class Mechanism extends Base {
         this.clearBoard(Boards.fieldState.empty, Boards.fieldState.neighbour, true);
         this.class('ship-holder')[0].remove();
         this.class('board-player')[0].addClass('blocked');
+        this.gameStatus = 2;
         info('INFO: Ship placement finished');
         this.alert('Placing Ai ships.');
     }
